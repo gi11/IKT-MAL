@@ -1,6 +1,12 @@
 # ITMAL Øvelser - Uge 5
 
-
+- [ITMAL Øvelser - Uge 5](#itmal-%c3%98velser---uge-5)
+  - [Øvelse 1](#%c3%98velse-1)
+    - [a)](#a)
+    - [b)](#b)
+    - [c)](#c)
+    - [d)](#d)
+    - [e)](#e)
 
 ## Øvelse 1
 For this subexercise the group is to perform data analysis of the given dataset, namely "california housing prices". The subexercise consists of 5 parts which will be described herafter in chronological order. Before starting, the group needs to get the data read in the python workspace, to which is has been decided to store it as a pandas dataframe. This is done as pandas is build on numpy, and as such, has the same features as numpy with more. 

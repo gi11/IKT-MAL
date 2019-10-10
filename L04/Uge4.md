@@ -1,5 +1,10 @@
 # Uge 4 Øvelser
 
+- [Uge 4 Øvelser](#uge-4-%c3%98velser)
+  - [Øvelse 1](#%c3%98velse-1)
+    - [a)](#a)
+    - [b)](#b)
+
 ## Øvelse 1
 For this assignment, the group is to experiment with PCA for dimensional reduction and visualisation. 
 
