@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>L04.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family:  "Meiryo", "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+</head>
+<body>
+<h1 id="uge-4-%C3%B8velser">Uge 4 Øvelser</h1>
+<ul>
+<li><a href="#uge-4-%c3%98velser">Uge 4 Øvelser</a>
+<ul>
+<li><a href="#%c3%98velse-1">Øvelse 1</a>
+<ul>
+<li><a href="#a">a)</a></li>
+<li><a href="#b">b)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="%C3%B8velse-1">Øvelse 1</h2>
+<p>For this assignment, the group is to experiment with PCA for dimensional reduction and visualisation.</p>
+<h3 id="a">a)</h3>
+<p>For this first part, we are to read the data(handwritten digits), and plot some example pictures:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> load_digits
+<span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> PCA
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+<span class="hljs-keyword">import</span> matplotlib
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+<span class="hljs-comment"># Load digit data and split into training and test data</span>
+digits = load_digits()
+X = digits.data
+y = digits.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="hljs-number">0.33</span>, random_state=<span class="hljs-number">42</span>)
+</div></code></pre>
+<p>With the data loaded, some example pictures can be produced:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">#%% Plot single digit</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">plot_digit</span><span class="hljs-params">(digit, cmpsize=<span class="hljs-number">64</span>)</span>:</span>
+    s = int(np.sqrt(cmpsize))
+    image = digit.reshape(s, s)
+    plt.imshow(image, cmap = matplotlib.cm.binary, interpolation=<span class="hljs-string">"nearest"</span>)
+    plt.axis(<span class="hljs-string">"off"</span>)
+    plt.show()
+
+digit_index = <span class="hljs-number">5</span>
+plot_digit(X[digit_index])
+print(y[digit_index])
+</div></code></pre>
+<figure>
+<img src = fig/123.png>
+<caption> <center> Example pictures of the digits 1, 2 and 3 </caption>
+</figure>
+<p>From the pictures it is seen that the resulution is quite bad, though the digits shape can vaguely be used to determine the digit.</p>
+<h3 id="b">b)</h3>
+<p>In order to plot in the 2D space, the digits would have to be reduced to only 2 dimensions, meaning to find the vectors projection onto a surface placed in the $N_{digitResolution}$ space. In preperation for other parts of the assignment, and out of curiosity, dimensional reduction is performed with more than only 2 dimensions, and stored in a list of reduced sets:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">#%% Create PCAs with different number of components</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_pca</span><span class="hljs-params">(data, cmps)</span>:</span>
+    pca = PCA(n_components=cmps)
+    pca.fit(data)
+    <span class="hljs-keyword">return</span> pca
+
+dimensions_sq = [n**<span class="hljs-number">2</span> <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> range(<span class="hljs-number">1</span>,<span class="hljs-number">7</span>)] <span class="hljs-comment"># 4, 9, 16 ...</span>
+dimensions_2n = [<span class="hljs-number">2</span>**n <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> range(<span class="hljs-number">1</span>,<span class="hljs-number">7</span>)] <span class="hljs-comment"># 2, 4, 8 ...</span>
+dimensions = sorted(set(dimensions_sq + dimensions_2n))
+
+pca = {n: create_pca(X_train, n) <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> dimensions}
+
+X_reduced = {n: pca[n].fit_transform(X_train) <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> dimensions}
+
+print(<span class="hljs-string">f"Created <span class="hljs-subst">{len(dimensions)}</span> pca's of training data with dimensions <span class="hljs-subst">{dimensions}</span>"</span>)
+</div></code></pre>
+<p>Which outputs:</p>
+<pre class="hljs"><code><div>Created 10 pca's of training data with dimensions [1, 2, 4, 8, 9, 16, 25, 32, 36, 64]
+</div></code></pre>
+<p>With the above, a scatterplot can be produced. One could extract only two columns from one of the PCA's with more than 2 dimensions, but with the assumption that the variance is maximised of the PCA when perform the fit with only 2 components, this is the one chosen:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">#%% Split data into which digit it "should" represent</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">mkdict1</span><span class="hljs-params">(x_reduced)</span>:</span> <span class="hljs-comment"># Method 1</span>
+    xdict={i:[] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">10</span>)}
+    <span class="hljs-keyword">for</span> i, x <span class="hljs-keyword">in</span> enumerate(x_reduced):
+        xdict[y_train[i]].append(x)
+    <span class="hljs-keyword">return</span> {i:np.array(xdict[i]) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">10</span>)}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">mkdict2</span><span class="hljs-params">(x_reduced)</span>:</span> <span class="hljs-comment"># Method 2</span>
+    <span class="hljs-keyword">return</span> {
+        digit: np.array([x <span class="hljs-keyword">for</span> xi, x <span class="hljs-keyword">in</span> enumerate(x_reduced) <span class="hljs-keyword">if</span> y_train[xi] == digit]) 
+        <span class="hljs-keyword">for</span> digit <span class="hljs-keyword">in</span> range(<span class="hljs-number">10</span>)
+    }
+
+<span class="hljs-comment">#%% Time the two different mothods of creating dict</span>
+<span class="hljs-keyword">from</span> timeit <span class="hljs-keyword">import</span> timeit
+r1 = timeit(<span class="hljs-keyword">lambda</span>: mkdict1(X_reduced[<span class="hljs-number">2</span>]), number=<span class="hljs-number">100</span>)
+r2 = timeit(<span class="hljs-keyword">lambda</span>: mkdict2(X_reduced[<span class="hljs-number">2</span>]), number=<span class="hljs-number">100</span>)
+print(<span class="hljs-string">f"mkdict1 = <span class="hljs-subst">{r1}</span>"</span>)
+print(<span class="hljs-string">f"mkdict2 = <span class="hljs-subst">{r2}</span>"</span>)
+print(<span class="hljs-string">"the fastest is {}"</span>.format(<span class="hljs-string">"mkdict1"</span> <span class="hljs-keyword">if</span> r1 &lt; r2 <span class="hljs-keyword">else</span> <span class="hljs-string">"mkdict2"</span>))
+
+<span class="hljs-comment">#%% Plot the two-component representation of digits and color by 'actual' digit</span>
+npdict = mkdict1(X_reduced[<span class="hljs-number">2</span>])
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">plot_two_component_digits</span><span class="hljs-params">(digits)</span>:</span>
+    plt.figure()
+    <span class="hljs-keyword">for</span> dnum <span class="hljs-keyword">in</span> digits:
+        plt.scatter(npdict[dnum][:,<span class="hljs-number">0</span>], npdict[dnum][:,<span class="hljs-number">1</span>], s=<span class="hljs-number">2</span>, label=str(dnum))
+    <span class="hljs-comment"># plt.axis('equal')</span>
+    plt.legend()
+    plt.show()
+
+plot_two_component_digits([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])
+plot_two_component_digits([<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>])
+plot_two_component_digits([<span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>])
+plot_two_component_digits([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>])
+</div></code></pre>
+<p>The above code yields the plots as seen below:</p>
+<figure>
+<img src = fig/scatter_2D.png>
+<caption> <center> Scatter plot with all digits in 2D </caption>
+<img src = fig/AllScatters.png>
+<caption> <center> Scatter plots easily readable pr. digit </caption>
+</figure>
+<p>From which it is seen that event after dimension reduction, the digits are still somewhat distinguishiable when looked at in sets. When plotted all together, it becomes hard to disinguish them. This makes somewhat sense, as digits can be seen as combination of smaller patterns, e.g both 9 and 1 consists of a vertical line, and as such, when compressing these, we loose resolution, and they will become more similar.</p>
+
+</body>
+</html>
