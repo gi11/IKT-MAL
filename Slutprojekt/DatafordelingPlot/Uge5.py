@@ -12,9 +12,10 @@ import pandas as pd
 from pandas.plotting import scatter_matrix
 import sklearn.preprocessing as sklpre
 import math
-
+import os
+import sys
 #%%
-data_csv_path = "C:\\Users\\Gill\\IKT\\MAL\\repos\\IKT-MAL\\Slutprojekt\\DatafordelingPlot\\SpotifyFeatures.csv"
+data_csv_path = os.path.abspath(os.path.dirname(sys.argv[0])) + "\SpotifyFeatures.csv"
 spotifyDBData = pd.read_csv(data_csv_path, sep=',', header=0)
 
 #%%
@@ -163,6 +164,29 @@ def plot_audiofeatures(genres, cols=3, width=18, hspace=0.3):
 plot_audiofeatures(["blues", "classical", "comedy", "country", "electronic", 
                     "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
 
+#%% Radar diagrams above works well - what we are actually doing is looking for distinctions between the genres
+# Could have been achieved by plotting mean on y, genre on x for each feature.. Tiresome, which is why radar diagrams
+# was used
+
+def plot_nonOptimalFeaturePlot(fname, genres, width=10, hspace=0.3):
+    plt.figure(figsize=(width, width))
+    means = []
+    xtickPos = []
+    for i, genre in enumerate(genres):
+        genre = genre if genre.startswith("genre_") else "genre_" + genre
+        findex = audiofeature_cols.index(fname)
+        means.append(afeatures_mean[genre][findex])
+        xtickPos.append(i)    
+    
+    plt.bar(xtickPos, means)
+    plt.xticks(xtickPos, [genre.capitalize() for genre in genres])
+    
+features = ["popularity",]
+
+plot_nonOptimalFeaturePlot("popularity", ["blues", "classical", "comedy", "country", "electronic", 
+                    "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
+    
+    
 #%%
     
 attributes = ["tempo", "popularity", "acousticness", "danceability", "energy"]
@@ -171,7 +195,7 @@ axs = scatter_matrix(onehotenc[attributes], figsize=(20,20), alpha=0.01)
 
 #%%
 att2 = ["popularity","instrumentalness", "liveness", "speechiness", "valence"]
-axs = scatter_matrix(onehotenc[att2], figsize=(12,8))
+axs = scatter_matrix(onehotenc[att2], figsize=(20,20), alpha=0.01)
 
 #%% How about danceability ? Can it be used to predict popularity?
 PD = spotifyDBData[['danceability','energy']]
@@ -179,3 +203,73 @@ corrcoef = np.corrcoef(PD.T) # obs: rækker=variable, kolonner=samples (modsat n
 
 
 #%%
+print("===============================================================================================")
+print("================================= PERFORMING DATA CLEANING ====================================")
+print("===============================================================================================")
+
+genres.remove("genre_a-capella")
+# Removing ALL samples with a popularity of 0
+for genre in genres:
+    tracks[genre] = tracks[genre][tracks[genre].popularity > 0.01]
+    
+cols = 4   # How many subplots pr row
+width = 15 # Width of figure
+prop = 1/3 # Subplot proportions, height/width ratio of subfigures
+
+rows = int(len(UniqueGenres)/cols)+1
+height = (rows/cols)*width*prop
+
+fig, ax = plt.subplots(rows, cols, figsize=(width,height))
+plt.subplots_adjust(wspace=0.2, hspace=1)
+for index, genre in enumerate(genres):
+    row, col = int(index/cols), index % cols
+    #genre_tracks = spotifyDBData.loc[spotifyDBData['genre'] == genre]
+    popularity = tracks[genre]['popularity']
+    title = genre + ", N = " + str(len(popularity))
+    ax[row,col].hist(popularity, bins=50, density=True, label='Track Popularity')
+    ax[row,col].set_title(title)
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#testDF = tracks["genre_classical"]
+#print(testDF.size)
+#filteredDF = testDF[testDF.popularity != 0]
+#print(filteredDF.size)
+#trackPopularity = filteredDF['popularity']
+#
+## Find the statistical properties of the popularity
+#mu = np.mean(trackPopularity)
+#sigma = np.std(trackPopularity)
+#sigma2 = np.var(trackPopularity)
+#median = np.median(trackPopularity)
+#
+## Create an object to plot into
+#fig, ax = plt.subplots(1, 1, figsize=[10,6])
+#
+## Now plot the popularity data to get an idea of it's distribution
+#ax.hist(trackPopularity,bins=100, density=True, label='Track Popularity') # Normalises the histogram
+#plt.xlabel('Popularity rating')
+#plt.ylabel('Normalised Counts')
+#ax.axvline(mu, color='b', label = "Mean")
+#ax.axvline(median, color='r', label="Median")
+#
+## Try and fit a gausian distribution
+#xarr = np.linspace(np.max(trackPopularity), np.min(trackPopularity), 500)
+#ax.plot(xarr, norm.pdf(xarr, mu, sigma), label='True gausian PDF')
+#ax.legend()
+#
+#
+#
+#
+#
+#
