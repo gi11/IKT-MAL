@@ -197,6 +197,13 @@ axs = scatter_matrix(onehotenc[attributes], figsize=(20,20), alpha=0.01)
 att2 = ["popularity","instrumentalness", "liveness", "speechiness", "valence"]
 axs = scatter_matrix(onehotenc[att2], figsize=(20,20), alpha=0.01)
 
+#%%
+att3 = ["popularity","duration_ms"]
+axs = scatter_matrix(onehotenc[att3], figsize=(20,20), alpha=0.01)
+
+#%%
+att4 = ["duration_ms","genre"]
+axs = scatter_matrix(spotifyDBData[att4], figsize=(20,20), alpha=0.01)
 #%% How about danceability ? Can it be used to predict popularity?
 PD = spotifyDBData[['danceability','energy']]
 corrcoef = np.corrcoef(PD.T) # obs: rækker=variable, kolonner=samples (modsat normalt..)
@@ -263,7 +270,11 @@ for index, genre in enumerate(UniqueGenres):
     
 # Should we just filter out the outliers of duration as well? Could one go about
 # it differently, e.g is there to manny to simply assign them to the mean? tendency
-# seems to be that duration for each genre has a nice distribution
+# seems to be that duration for each genre has a nice distribution. 
+# Would it be beneficial to convert units - e.g from ms to s? Decrease the size
+# of the numbers before performing the scaling? 
+
+# It has been decided to drop this feature, as the correlation 
         
         
 #%% What should one do about the Key feature? 
@@ -276,18 +287,37 @@ uniqueFeatureLabels(spotifyDBData, "key") # = 12
 # Is it feasible to one hot encode this ? This would add an additional 11 features
 # - This combined with the genre encoding could cause feature overload? Would our model
 # Have enough samples to learn? Should this feature be dropped completely?
+
+# It has been decided to drop this feature - as our samplesize is only 230000, minus the ones
+# with 0 popularity rating. For fear of inproper training of the model due to the sheer size
+# of the feature list, this feature will be dropped. 
+
 # ---------------- What should one do about mode? ---------------------------------
 uniqueFeatureLabels(spotifyDBData, 'mode') # = 2
-
-
 # Only expands to one addtional feature - should be one hot encoded. 
+# Decided to include this. Use one hot encoding. 
 
+#%%
 # ------------ What should one do about time_signature feature? -------------------
 uniqueFeatureLabels(spotifyDBData, 'time_signature') # = 5
-
 # Is it feasible to encode into 4 addtional features? ... 
+# Clean this data - 1/4 and 0/4 should be removed. 
+# 0/4 does not exit? Drop this. 
+fig, ax = plt.subplots(1, 1, figsize=(width,height))
+UniqueTS = spotifyDBData['time_signature'].unique()
+N_uTS = []
+for TS in UniqueTS:
+    inSignature = spotifyDBData[spotifyDBData['time_signature'] == TS]
+    N_uTS.append(len(inSignature))
+    print("For time signature: ", TS, ", samples: ",  len(inSignature))
+    
+
+ax.hist(N_uTS, bins=5, density=True, label='Track Popularity')
+    
 
 #%% Last part, when above is done, create a new script without plots that only performs data cleaning and feature scaling
 # Let it store the result as a new csv file from which the next step in the pipeline can read from...
 
-    
+# REMEMBER:
+# OneHotEncoder CANNOT BE USED FOR Y VALUES - USE LABELBINARIZER INSTEAD!
+
