@@ -202,7 +202,7 @@ PD = spotifyDBData[['danceability','energy']]
 corrcoef = np.corrcoef(PD.T) # obs: rækker=variable, kolonner=samples (modsat normalt..)
 
 
-#%%
+#%% ---------------------- REMOVING ALL THE SONGS WITH A 0 POPULARITY RATING --------------------------
 print("===============================================================================================")
 print("================================= PERFORMING DATA CLEANING ====================================")
 print("===============================================================================================")
@@ -226,50 +226,68 @@ for index, genre in enumerate(genres):
     #genre_tracks = spotifyDBData.loc[spotifyDBData['genre'] == genre]
     popularity = tracks[genre]['popularity']
     title = genre + ", N = " + str(len(popularity))
-    ax[row,col].hist(popularity, bins=50, density=True, label='Track Popularity')
+    ax[row,col].hist(popularity, bins=40, density=True, label='Track Popularity')
     ax[row,col].set_title(title)
 
+# THAT'S MORE LIKE IT ! GREAT CLEANING!
+
+#%% -------------- CHECK THE DURATION FEATURE IF SCALING CAN BE DONE ------------------------------
+cols = 4   # How many subplots pr row
+width = 15 # Width of figure
+prop = 1/3 # Subplot proportions, height/width ratio of subfigures
+
+rows = int(len(UniqueGenres)/cols)+1
+height = (rows/cols)*width*prop
+
+fig, ax = plt.subplots(rows, cols, figsize=(width,height))
+plt.subplots_adjust(wspace=0.2, hspace=1)
+for index, genre in enumerate(UniqueGenres):
+    if genre != "A Capella":
+        row, col = int(index/cols), index % cols
+        genre_tracks = spotifyDBData.loc[spotifyDBData['genre'] == genre]
+        duration = genre_tracks['duration_ms']
+        title = genre + ", N = " + str(len(duration))
+        ax[row,col].hist(duration, bins=40, density=True, label='Track Popularity')
+        ax[row,col].set_title(title)
+    
+        sub_mean = np.mean(duration)
+        sub_median = np.median(duration)
+        sub_max = np.max(duration)
+        print(sub_max)
+    
+        ax[row,col].axvline(sub_mean, color='b', label = "Mean")
+        ax[row,col].axvline(sub_median, color='r', label="Median")
+        ax[row,col].axvline(sub_max, color='y', label="Max")
+        
+        sub_max = 0
+    
+# Should we just filter out the outliers of duration as well? Could one go about
+# it differently, e.g is there to manny to simply assign them to the mean? tendency
+# seems to be that duration for each genre has a nice distribution
+        
+        
+#%% What should one do about the Key feature? 
+def uniqueFeatureLabels(df, fName):
+    UniqueLabels = df[fName].unique()  
+    print("Unique labels for ", fName,":", len(UniqueLabels))
+    
+uniqueFeatureLabels(spotifyDBData, "key") # = 12
+
+# Is it feasible to one hot encode this ? This would add an additional 11 features
+# - This combined with the genre encoding could cause feature overload? Would our model
+# Have enough samples to learn? Should this feature be dropped completely?
+# ---------------- What should one do about mode? ---------------------------------
+uniqueFeatureLabels(spotifyDBData, 'mode') # = 2
 
 
+# Only expands to one addtional feature - should be one hot encoded. 
 
+# ------------ What should one do about time_signature feature? -------------------
+uniqueFeatureLabels(spotifyDBData, 'time_signature') # = 5
 
+# Is it feasible to encode into 4 addtional features? ... 
 
+#%% Last part, when above is done, create a new script without plots that only performs data cleaning and feature scaling
+# Let it store the result as a new csv file from which the next step in the pipeline can read from...
 
-
-
-
-
-#
-#
-#testDF = tracks["genre_classical"]
-#print(testDF.size)
-#filteredDF = testDF[testDF.popularity != 0]
-#print(filteredDF.size)
-#trackPopularity = filteredDF['popularity']
-#
-## Find the statistical properties of the popularity
-#mu = np.mean(trackPopularity)
-#sigma = np.std(trackPopularity)
-#sigma2 = np.var(trackPopularity)
-#median = np.median(trackPopularity)
-#
-## Create an object to plot into
-#fig, ax = plt.subplots(1, 1, figsize=[10,6])
-#
-## Now plot the popularity data to get an idea of it's distribution
-#ax.hist(trackPopularity,bins=100, density=True, label='Track Popularity') # Normalises the histogram
-#plt.xlabel('Popularity rating')
-#plt.ylabel('Normalised Counts')
-#ax.axvline(mu, color='b', label = "Mean")
-#ax.axvline(median, color='r', label="Median")
-#
-## Try and fit a gausian distribution
-#xarr = np.linspace(np.max(trackPopularity), np.min(trackPopularity), 500)
-#ax.plot(xarr, norm.pdf(xarr, mu, sigma), label='True gausian PDF')
-#ax.legend()
-#
-#
-#
-#
-#
-#
+    
