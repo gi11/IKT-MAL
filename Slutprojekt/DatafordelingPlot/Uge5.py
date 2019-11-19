@@ -12,9 +12,10 @@ import pandas as pd
 from pandas.plotting import scatter_matrix
 import sklearn.preprocessing as sklpre
 import math
-
+import os
+import sys
 #%%
-data_csv_path = "C:\\Users\\Gill\\IKT\\MAL\\repos\\IKT-MAL\\Slutprojekt\\DatafordelingPlot\\SpotifyFeatures.csv"
+data_csv_path = os.path.abspath(os.path.dirname(sys.argv[0])) + "\SpotifyFeatures.csv"
 spotifyDBData = pd.read_csv(data_csv_path, sep=',', header=0)
 
 #%%
@@ -163,6 +164,29 @@ def plot_audiofeatures(genres, cols=3, width=18, hspace=0.3):
 plot_audiofeatures(["blues", "classical", "comedy", "country", "electronic", 
                     "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
 
+#%% Radar diagrams above works well - what we are actually doing is looking for distinctions between the genres
+# Could have been achieved by plotting mean on y, genre on x for each feature.. Tiresome, which is why radar diagrams
+# was used
+
+def plot_nonOptimalFeaturePlot(fname, genres, width=10, hspace=0.3):
+    plt.figure(figsize=(width, width))
+    means = []
+    xtickPos = []
+    for i, genre in enumerate(genres):
+        genre = genre if genre.startswith("genre_") else "genre_" + genre
+        findex = audiofeature_cols.index(fname)
+        means.append(afeatures_mean[genre][findex])
+        xtickPos.append(i)    
+    
+    plt.bar(xtickPos, means)
+    plt.xticks(xtickPos, [genre.capitalize() for genre in genres])
+    
+features = ["popularity",]
+
+plot_nonOptimalFeaturePlot("popularity", ["blues", "classical", "comedy", "country", "electronic", 
+                    "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
+    
+    
 #%%
     
 attributes = ["tempo", "popularity", "acousticness", "danceability", "energy"]
@@ -171,11 +195,129 @@ axs = scatter_matrix(onehotenc[attributes], figsize=(20,20), alpha=0.01)
 
 #%%
 att2 = ["popularity","instrumentalness", "liveness", "speechiness", "valence"]
-axs = scatter_matrix(onehotenc[att2], figsize=(12,8))
+axs = scatter_matrix(onehotenc[att2], figsize=(20,20), alpha=0.01)
 
+#%%
+att3 = ["popularity","duration_ms"]
+axs = scatter_matrix(onehotenc[att3], figsize=(20,20), alpha=0.01)
+
+#%%
+att4 = ["duration_ms","genre"]
+axs = scatter_matrix(spotifyDBData[att4], figsize=(20,20), alpha=0.01)
 #%% How about danceability ? Can it be used to predict popularity?
 PD = spotifyDBData[['danceability','energy']]
 corrcoef = np.corrcoef(PD.T) # obs: rækker=variable, kolonner=samples (modsat normalt..)
 
 
+#%% ---------------------- REMOVING ALL THE SONGS WITH A 0 POPULARITY RATING --------------------------
+print("===============================================================================================")
+print("================================= PERFORMING DATA CLEANING ====================================")
+print("===============================================================================================")
+
+genres.remove("genre_a-capella")
+# Removing ALL samples with a popularity of 0
+for genre in genres:
+    tracks[genre] = tracks[genre][tracks[genre].popularity > 0.01]
+    
+cols = 4   # How many subplots pr row
+width = 15 # Width of figure
+prop = 1/3 # Subplot proportions, height/width ratio of subfigures
+
+rows = int(len(UniqueGenres)/cols)+1
+height = (rows/cols)*width*prop
+
+fig, ax = plt.subplots(rows, cols, figsize=(width,height))
+plt.subplots_adjust(wspace=0.2, hspace=1)
+for index, genre in enumerate(genres):
+    row, col = int(index/cols), index % cols
+    #genre_tracks = spotifyDBData.loc[spotifyDBData['genre'] == genre]
+    popularity = tracks[genre]['popularity']
+    title = genre + ", N = " + str(len(popularity))
+    ax[row,col].hist(popularity, bins=40, density=True, label='Track Popularity')
+    ax[row,col].set_title(title)
+
+# THAT'S MORE LIKE IT ! GREAT CLEANING!
+
+#%% -------------- CHECK THE DURATION FEATURE IF SCALING CAN BE DONE ------------------------------
+cols = 4   # How many subplots pr row
+width = 15 # Width of figure
+prop = 1/3 # Subplot proportions, height/width ratio of subfigures
+
+rows = int(len(UniqueGenres)/cols)+1
+height = (rows/cols)*width*prop
+
+fig, ax = plt.subplots(rows, cols, figsize=(width,height))
+plt.subplots_adjust(wspace=0.2, hspace=1)
+for index, genre in enumerate(UniqueGenres):
+    if genre != "A Capella":
+        row, col = int(index/cols), index % cols
+        genre_tracks = spotifyDBData.loc[spotifyDBData['genre'] == genre]
+        duration = genre_tracks['duration_ms']
+        title = genre + ", N = " + str(len(duration))
+        ax[row,col].hist(duration, bins=40, density=True, label='Track Popularity')
+        ax[row,col].set_title(title)
+    
+        sub_mean = np.mean(duration)
+        sub_median = np.median(duration)
+        sub_max = np.max(duration)
+        print(sub_max)
+    
+        ax[row,col].axvline(sub_mean, color='b', label = "Mean")
+        ax[row,col].axvline(sub_median, color='r', label="Median")
+        ax[row,col].axvline(sub_max, color='y', label="Max")
+        
+        sub_max = 0
+    
+# Should we just filter out the outliers of duration as well? Could one go about
+# it differently, e.g is there to manny to simply assign them to the mean? tendency
+# seems to be that duration for each genre has a nice distribution. 
+# Would it be beneficial to convert units - e.g from ms to s? Decrease the size
+# of the numbers before performing the scaling? 
+
+# It has been decided to drop this feature, as the correlation 
+        
+        
+#%% What should one do about the Key feature? 
+def uniqueFeatureLabels(df, fName):
+    UniqueLabels = df[fName].unique()  
+    print("Unique labels for ", fName,":", len(UniqueLabels))
+    
+uniqueFeatureLabels(spotifyDBData, "key") # = 12
+
+# Is it feasible to one hot encode this ? This would add an additional 11 features
+# - This combined with the genre encoding could cause feature overload? Would our model
+# Have enough samples to learn? Should this feature be dropped completely?
+
+# It has been decided to drop this feature - as our samplesize is only 230000, minus the ones
+# with 0 popularity rating. For fear of inproper training of the model due to the sheer size
+# of the feature list, this feature will be dropped. 
+
+# ---------------- What should one do about mode? ---------------------------------
+uniqueFeatureLabels(spotifyDBData, 'mode') # = 2
+# Only expands to one addtional feature - should be one hot encoded. 
+# Decided to include this. Use one hot encoding. 
+
 #%%
+# ------------ What should one do about time_signature feature? -------------------
+uniqueFeatureLabels(spotifyDBData, 'time_signature') # = 5
+# Is it feasible to encode into 4 addtional features? ... 
+# Clean this data - 1/4 and 0/4 should be removed. 
+# 0/4 does not exit? Drop this. 
+fig, ax = plt.subplots(1, 1, figsize=(width,height))
+UniqueTS = spotifyDBData['time_signature'].unique()
+N_uTS = []
+for TS in UniqueTS:
+    inSignature = spotifyDBData[spotifyDBData['time_signature'] == TS]
+    N_uTS.append(len(inSignature))
+    print("For time signature: ", TS, ", samples: ",  len(inSignature))
+    
+
+ax.hist(N_uTS, bins=5, density=True, label='Track Popularity')
+    
+
+#%% Last part, when above is done, create a new script without plots that only performs data cleaning and feature scaling
+# Let it store the result as a new csv file from which the next step in the pipeline can read from...
+
+# REMEMBER:
+# OneHotEncoder CANNOT BE USED FOR Y VALUES - USE LABELBINARIZER INSTEAD!
+

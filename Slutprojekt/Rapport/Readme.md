@@ -37,4 +37,4 @@ Set the two vscode extensions to use the filter by setting following settings in
 ## Notes
 
 - The vscode-pandoc extension will not render the pdf if the previous render is open somewhere
-- 
+- Remember to add a newline at the end of each included file (and between sections in general), as pandoc/markdown can produce some unexpected behaviour if things are not seperated properly with newlines
