@@ -13,10 +13,6 @@ abstract: |
     It consists of two paragraphs
 ---
 
-!include example_section.md
-
-
-!include examplesubfolder_1/examplesection_1.md
-
-!include examplesubfolder_2/examplesection_2.md
+\newpage
+!include introduction/introduction.md
 
