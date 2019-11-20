@@ -19,4 +19,3 @@ abstract: |
 !include examplesubfolder_1/examplesection_1.md
 
 !include examplesubfolder_2/examplesection_2.md
-
