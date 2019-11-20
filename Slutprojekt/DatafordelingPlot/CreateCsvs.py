@@ -41,6 +41,7 @@ minmaxscaler = sklpre.MinMaxScaler()
 audiofeature_cols = ['popularity', 'acousticness', 'danceability', 'energy', 
                  'instrumentalness', 'liveness', 'loudness', 'speechiness', 
                  'tempo', 'valence']
+
 df_scaled = pd.DataFrame(spotifyDBData)
 df_scaled[audiofeature_cols] = pd.DataFrame(
         minmaxscaler.fit_transform(df_scaled[audiofeature_cols]), 
@@ -59,10 +60,12 @@ onehotenc = pd.get_dummies(df_scaled, columns=["genre","mode","time_signature"])
 # Rename/format onehot encoded columns (lowercase, no special symbols)
 replacements = {' ':'-', '&':'n', '’':'', '/':'-'}
 onehotenc.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), onehotenc.columns)
+df_scaled.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), df_scaled.columns)
 print(list(onehotenc.columns)) # Check column names
 
 # %%
 df_scaled.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed.csv', index=False)
 onehotenc.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_onehotenc.csv', index=False)
+
 # %%
 
