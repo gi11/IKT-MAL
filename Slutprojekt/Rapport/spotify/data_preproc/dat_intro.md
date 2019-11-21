@@ -31,3 +31,5 @@ It should be noted that for the classifier there is a fear of the dataset being 
 !include dat_Visualisation.md
 
 !include dat_Cleaning.md
+
+!include dat_FScaling.md
