@@ -15,7 +15,8 @@ import math
 import os
 import sys
 #%%
-data_csv_path = os.path.abspath(os.path.dirname(sys.argv[0])) + "\SpotifyFeatures.csv"
+# data_csv_path = os.path.abspath(os.path.dirname(sys.argv[0])) + "\SpotifyFeatures.csv"
+data_csv_path = os.path.dirname(__file__) + "/SpotifyFeatures.csv"
 spotifyDBData = pd.read_csv(data_csv_path, sep=',', header=0)
 
 #%%
@@ -161,9 +162,36 @@ def plot_audiofeatures(genres, cols=3, width=18, hspace=0.3):
         title = genre.replace("genre_","").capitalize()
         radar_subplot(categories, layers, title, subplot)
         
-plot_audiofeatures(["blues", "classical", "comedy", "country", "electronic", 
-                    "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
+# plot_audiofeatures(["blues", "classical", "comedy", "country", "electronic", 
+#                     "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
 
+#%%
+
+all_genres = [
+ 'dance',
+ 'indie',
+ 'pop',
+ 'rnb',
+ 'rap',
+ 'reggae',
+ 'reggaeton',
+ 'rock',
+ 'ska',
+
+ 'folk',
+ 'jazz',
+ 
+ 'classical',
+ 'comedy',
+ 'country',
+ 'electronic',
+ 'hip-hop',
+ 'movie',
+ 'opera',
+ 'soul',
+ 'soundtrack',
+ 'world']
+plot_audiofeatures(all_genres, width=10)
 #%% Radar diagrams above works well - what we are actually doing is looking for distinctions between the genres
 # Could have been achieved by plotting mean on y, genre on x for each feature.. Tiresome, which is why radar diagrams
 # was used

@@ -12,39 +12,55 @@ from sklearn import datasets
 
 import sys
 import os
-# sys.path.append("../../include/")
+sys.path.append("../../include/")
 sys.path.append(os.path.dirname(__file__) + "/../../include/")
+sys.path.append(os.path.dirname(__file__) + "/../")
+# sys.path.append(os.path.dirname(__file__) + "\\..\\..\\include")
 
 #%%
-from libitmal import dataloaders_v3 as itmaldataloaders
+from libitmal import dataloaders as itmaldataloaders
 
 #%%
 import pandas as pd
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 
 data_csv_path = os.path.dirname(__file__) + "\\..\\DatafordelingPlot\\spotifyDBData_preprocessed.csv"
-spotifyDBData = pd.read_csv(data_csv_path, sep=',', header=0)
-input_features = [
-    # "popularity",
-    "acousticness",
-    "danceability",
-    "energy",
-    "instrumentalness",
-    "liveness",
-    "loudness",
-    "speechiness",
-    "tempo",
-    "valence",
-    # "mode",
-    # "time_signature",
+data_csv_path_onehot = os.path.dirname(__file__) + "\\..\\DatafordelingPlot\\spotifyDBData_preprocessed_onehotenc.csv"
+data_csv_path_onehot_mode_tsig = os.path.dirname(__file__) + "\\..\\DatafordelingPlot\\spotifyDBData_preprocessed_mode-tsig_onehotenc.csv"
+
+def loadPreprocessed():
+    return pd.read_csv(data_csv_path, sep=',', header=0)
+
+def loadPreprocessedOnehotenc():
+    return pd.read_csv(data_csv_path_onehot, sep=',', header=0)
+
+def loadPreprocessedModeTsigOnehotenc():
+    return pd.read_csv(data_csv_path_onehot_mode_tsig, sep=',', header=0)
+
+allgenres = ['Alternative', 'Anime', 'Blues', 'Children’s Music', 'Classical', 'Comedy',
+ 'Country', 'Dance', 'Electronic', 'Folk', 'Hip-Hop', 'Indie', 'Jazz', 'Movie',
+ 'Opera', 'Pop', 'R&B', 'Rap', 'Reggae', 'Reggaeton', 'Rock', 'Ska', 'Soul',
+ 'Soundtrack', 'World']
+
+regular_input_features = ["popularity", "acousticness", "danceability",
+    "energy", "instrumentalness",  "liveness", "loudness", "speechiness",
+    "tempo", "valence"
 ]
 
-def getSpotifyBinarizedXY():
-    X = np.array(spotifyDBData[input_features])
+onehot_input_features = [
+    "mode_major", "mode_minor",
+    "time_signature_3-4", "time_signature_4-4", "time_signature_5-4"
+]
 
+def getSpotifyBinarizedXY(remove_cols=None):
+    data_filtered = loadPreprocessed()
+    if (remove_cols is not None):
+        for col in remove_cols:
+            data_filtered = data_filtered[data_filtered.genre != col]
+    X_df = data_filtered[regular_input_features]
     lb = LabelBinarizer()
-    # lb.fit(np.array(spotifyDBData['genre']))
-    y = lb.fit_transform(np.array(spotifyDBData['genre']))
+    X = np.array(X_df)
+    y = lb.fit_transform(np.array(data_filtered['genre']))
 
     print("Binarized Label to the following classes")
     print(lb.classes_)
@@ -53,12 +69,20 @@ def getSpotifyBinarizedXY():
     return X, y
 
 def getSpotifyIntLabeledXY():
-    X = np.array(spotifyDBData[input_features])
+    spotifyDBData = loadPreprocessed()
+    X = np.array(spotifyDBData[regular_input_features])
 
     label_encoder = LabelEncoder() 
     y = label_encoder.fit_transform(spotifyDBData['genre']) 
-    # print(y.unique())
 
+    return X, y
+
+def getSpotifyOneHotEncXY():
+    spotifyDBData = loadPreprocessedModeTsigOnehotenc()
+    input_features = regular_input_features + onehot_input_features
+    X = np.array(spotifyDBData[input_features])
+
+    y = LabelEncoder().fit_transform(spotifyDBData['genre']) 
     return X, y
 
 
@@ -120,7 +144,7 @@ def ClassificationReport(model, X_test, y_test, target_names=None):
 def FullReport(model, X_test, y_test, t):
     print(f"SEARCH TIME: {t:0.2f} sec")
     beststr, bestmodel = SearchReport(model)
-    #ClassificationReport(model, X_test, y_test)    
+    ClassificationReport(model, X_test, y_test)    
     print(f"CTOR for best model: {bestmodel}\n")
     print(f"{beststr}\n")
     return beststr, bestmodel
@@ -151,9 +175,15 @@ def LoadAndSetupData(mode, test_size=0.3):
     elif mode=='iris':
         X, y = itmaldataloaders.IRIS_GetDataSet()
     elif mode=='spotify_binarized':
-        X, y = getSpotifyBinarizedXY()
+        #remove_cols = ['Alternative', 'Anime', 'Blues', 'Children’s Music', 'Classical', 'Comedy',
+            # 'Country', 'Dance', 'Electronic', 'Folk', 'Hip-Hop', 'Indie', 'Jazz', 'Movie',
+            # 'Opera', 'Pop', 'R&B', 'Reggae', 'Reggaeton']
+        remove_cols = None
+        X, y = getSpotifyBinarizedXY(remove_cols)
     elif mode=='spotify_intlabels':
         X, y = getSpotifyIntLabeledXY()
+    elif mode=='spotify_onehotin_labelout':
+        X, y = getSpotifyOneHotEncXY()
     else:
         raise ValueError(f"could not load data for that particular mode='{mode}'")
         
@@ -175,23 +205,87 @@ def LoadAndSetupData(mode, test_size=0.3):
 
 print('OK')
 
+
+
+#%%
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
+X_train, X_test, y_train, y_test = LoadAndSetupData('spotify_binarized')
+
+#%%
+classifier = KNeighborsClassifier(n_jobs=-1, weights='uniform', algorithm='ball_tree', p=2, n_neighbors=50)
+
+model = OneVsRestClassifier(classifier)
+model.fit(X_train, y_train)
+
+#%%
+# predictions = model.predict_proba(X_test)
+
+y_true, y_pred = y_test, model.predict_proba(X_test)
+
+target_names = ['Rap', 'Rock', 'Ska', 'Soul', 'Soundtrack', 'World']
+print(classification_report(y_true, y_pred, target_names))
+
+# CV=5
+# VERBOSE=0
+
+# start = time()
+# random_tuned = RandomizedSearchCV(
+#     model, 
+#     {"n_jobs": [None]}, 
+#     random_state=42,
+#     n_iter=1, 
+#     cv=CV, 
+#     scoring='f1_micro', 
+#     verbose=10, 
+#     n_jobs=-1, 
+#     iid=True)
+# random_tuned.fit(X_train, y_train)
+# t = time()-start
+
+# # Report result
+# b0, m0= FullReport(random_tuned , X_test, y_test, t)
+# print(b0)
+
+
+
+#%% Regular KNeighborsClassifier
+
+from sklearn.neighbors import KNeighborsClassifier
+
+X_train, X_test, y_train, y_test = LoadAndSetupData('spotify_onehotin_labelout')
+
+model = KNeighborsClassifier(n_jobs=-1, weights='uniform', algorithm='ball_tree', p=2, n_neighbors=50)
+model.fit(X_train, y_train)
+#%%
+y_true, y_pred = y_test, model.predict(X_test)
+# target_names = ['Rap', 'Rock', 'Ska', 'Soul', 'Soundtrack', 'World']
+
+print(classification_report(y_true, y_pred, target_names=allgenres))
+
+predictions= model.predict(X_test)
+predictions_prob = model.predict_proba(X_test)
+
+
+print(classification_report(y_true, y_pred, target_names=allgenres))
 #%%
 from sklearn.neighbors import KNeighborsClassifier
 
 # Setup data
-# 'iris', 'moon', 'mnist', 'spotify_classes', 'spotify_intlabels'
+# 'iris', 'moon', 'mnist', 'spotify_binarized', 'spotify_intlabels'
 X_train, X_test, y_train, y_test = LoadAndSetupData('spotify_intlabels')
 
 
 
 # Setup search parameters
-model = KNeighborsClassifier(n_jobs=-1)
+# model = KNeighborsClassifier(n_jobs=-1, weights='uniform', algorithm='ball_tree', p=2)
 
 tuning_parameters = {
-    'n_neighbors':[3,4,5],
-    'weights':('uniform', 'distance'),
-    'algorithm':('ball_tree', 'kd_tree', 'brute'),
-    'p':[2,3,4],   
+    'n_neighbors': [10,20,50,100]
+    # 'weights':('uniform'),
+    # 'algorithm':('ball_tree'),
+    # 'p':[2]
 }
 
 # tuning_parameters = {
@@ -222,8 +316,85 @@ t = time()-start
 # Report result
 b0, m0= FullReport(random_tuned , X_test, y_test, t)
 print(b0)
+#%% Genre Clustering
+
+# genres = list(filter(lambda name: "genre_" in name, onehotenc.columns))
+# audiofeature_cols = ['popularity', 'acousticness', 'danceability', 'energy', 
+#                  'instrumentalness', 'liveness', 'loudness', 'speechiness', 
+#                  'tempo', 'valence']       
+
+
+# tracks = {genre: df_scaled.loc[df_scaled[genre] == 1]
+#                     .reset_index(drop=True)
+#                     .filter(audiofeature_cols)
+#             for genre in genres}
+    
+# audiofeatures = {genre.replace("genre_",""): tracks[genre].describe()
+#                  for genre in genres}
+
+# # Mean and meadian
+# afeatures_mean = {genre: tracks[genre].mean().values.flatten().tolist()
+#                   for genre in genres}
+# afeatures_median = {genre: tracks[genre].median().values.flatten().tolist()
+#                     for genre in genres}
+
+#%%
+# from sklearn.cluster import KMeans
+
+# X_train, X_test, y_train, y_test = LoadAndSetupData('spotify_intlabels')
+# kmeans = KMeans(n_clusters=5, random_state=0).fit(X_train)
+
 
 # %%
 
 
-# %%
+# Results from KNeighborsClassifier:
+
+# model = KNeighborsClassifier(n_jobs=-1)
+# tuning_parameters = {
+#     'n_neighbors':[3,4,5],
+#     'weights':('uniform', 'distance'),
+#     'algorithm':('ball_tree', 'kd_tree', 'brute'),
+#     'p':[2,3,4],   
+# }
+
+# CTOR for best model: KNeighborsClassifier(algorithm='ball_tree', leaf_size=30, metric='minkowski',
+#                     metric_params=None, n_jobs=-1, n_neighbors=5, p=2,
+#                     weights='uniform')
+# best: dat=spotify_intlabels, score=0.23061, 
+# model=KNeighborsClassifier(algorithm='ball_tree',n_neighbors=5,p=2,weights='uniform')
+
+
+
+# model = KNeighborsClassifier(n_jobs=-1, weights='uniform', algorithm='ball_tree', p=2)
+# tuning_parameters = {
+#     'n_neighbors':[5,10,20]
+# }
+
+# Grid scores ('f1_micro') on development set:
+# 	[ 0]: 0.231 (+/-0.003) for {'n_neighbors': 5}
+# 	[ 1]: 0.257 (+/-0.002) for {'n_neighbors': 10}
+# 	[ 2]: 0.275 (+/-0.003) for {'n_neighbors': 20}
+# CTOR for best model: KNeighborsClassifier(algorithm='ball_tree', leaf_size=30, metric='minkowski',
+#                      metric_params=None, n_jobs=-1, n_neighbors=20, p=2,
+#                      weights='uniform')
+# best: dat=spotify_intlabels, score=0.27533, model=KNeighborsClassifier(n_neighbors=20)
+
+
+# model = KNeighborsClassifier(n_jobs=-1, weights='uniform', algorithm='ball_tree', p=2)
+# tuning_parameters = {
+#     'n_neighbors':[10,20,50,100]
+#     # 'weights':('uniform'),
+#     # 'algorithm':('ball_tree'),
+#     # 'p':[2]
+# }
+
+# Grid scores ('f1_micro') on development set:
+# 	[ 0]: 0.257 (+/-0.002) for {'n_neighbors': 10}
+# 	[ 1]: 0.275 (+/-0.003) for {'n_neighbors': 20}
+# 	[ 2]: 0.289 (+/-0.004) for {'n_neighbors': 50}
+# 	[ 3]: 0.292 (+/-0.004) for {'n_neighbors': 100}
+# CTOR for best model: KNeighborsClassifier(algorithm='ball_tree', leaf_size=30, metric='minkowski',
+#                      metric_params=None, n_jobs=-1, n_neighbors=100, p=2,
+#                      weights='uniform')
+# best: dat=spotify_intlabels, score=0.29227, model=KNeighborsClassifier(n_neighbors=100)
