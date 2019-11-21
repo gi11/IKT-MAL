@@ -18,7 +18,7 @@ This process would get rather tiresome to do for each feature, and as such, a ra
 
 ![Mean/Median value for each feature, pr genre visualised on radar plots](../img/genre_radar.png){#radar_plot width=80%}
 
-Now, from the above, a distinction between the shapes of the radarplots can be seen, which is good, because in order for classifier to distinguish between genres, their features should differ in some way. 
+Now, from the above, a distinction between the shapes of the radarplots can be seen, which is good, because in order for classifier to distinguish between genres, their features should differ in some way. There is however some issues, which can be seen looking if comparing for example Rock, Raggae and Country. The shape in the radar plot of these genres is very similar, and as such, it must be expected that trying to classify tracks included in these genres will be harder. This thought will be expanded upon later in the report, after the data has been processed, after which a PCA would be beneficial to further continue this analysis. 
 
 Now, in moving back to the regressor which was to be used to predict popularity, the correlations between popularity and other features should be analysed. Turning the beforementioned analysis around, where popularity was argued to be somewhat related to genre, the genre feature can be seen as an important feature to predict the popularity from - this leaves the rest of the features to be analysed. To easily visualise the results of these correlations, scikik learns _scatter_matrix()_ is used. Using only some of the features here as an example, the results of running the _scatter_matrix()_ is seen below: 
 
