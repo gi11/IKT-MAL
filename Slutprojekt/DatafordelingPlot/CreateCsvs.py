@@ -18,7 +18,7 @@ spotifyDBData = pd.read_csv(data_csv_path, sep=',', header=0)
 remove_cols = ["artist_name", "track_name", "track_id", "duration_ms", "key"]
 spotifyDBData = spotifyDBData.drop(columns=remove_cols)
 
-# spotifyDBData.count()
+spotifyDBData.count()
 
 # %% Remove tracks with invalid time signatures
 
@@ -35,6 +35,10 @@ spotifyDBData.count()
 spotifyDBData = spotifyDBData[spotifyDBData.genre != "A Capella"]
 spotifyDBData.count()
 
+#%% Remove tracks too unpopular
+spotifyDBData = spotifyDBData[spotifyDBData.popularity > 1]
+spotifyDBData.count()
+
 #%% Apply minmax scaling to audio features
 
 minmaxscaler = sklpre.MinMaxScaler()
@@ -42,7 +46,7 @@ audiofeature_cols = ['popularity', 'acousticness', 'danceability', 'energy',
                  'instrumentalness', 'liveness', 'loudness', 'speechiness', 
                  'tempo', 'valence']
 
-df_scaled = pd.DataFrame(spotifyDBData)
+df_scaled = spotifyDBData.copy()
 df_scaled[audiofeature_cols] = pd.DataFrame(
         minmaxscaler.fit_transform(df_scaled[audiofeature_cols]), 
         index=df_scaled[audiofeature_cols].index,
@@ -50,13 +54,12 @@ df_scaled[audiofeature_cols] = pd.DataFrame(
 
 df_scaled.count()
 
-
 #%% Apply std scaling to audio features
 
 from sklearn.preprocessing import StandardScaler
 
-stdscaler = sklpre.MinMaxScaler()
-df_scaled_std = pd.DataFrame(spotifyDBData)
+stdscaler = StandardScaler()
+df_scaled_std = spotifyDBData.copy()
 df_scaled_std[audiofeature_cols] = pd.DataFrame(
         stdscaler.fit_transform(df_scaled_std[audiofeature_cols]), 
         index=df_scaled_std[audiofeature_cols].index,
@@ -65,35 +68,42 @@ df_scaled_std[audiofeature_cols] = pd.DataFrame(
 
 df_scaled_std.count()
 
-#%% Remove tracks too unpopular
-df_scaled = df_scaled[df_scaled.popularity > 0.01]
-df_scaled_std = df_scaled_std[df_scaled_std.popularity > 0.01]
+# #%% Remove tracks too unpopular (minmax)
+# df_scaled = df_scaled[df_scaled.popularity > 0.01]
+# df_scaled.count()
 
-
-df_scaled.count()
-df_scaled_std.count()
+# #%% Remove tracks too unpopular (std)
+# df_scaled_std = df_scaled_std[df_scaled_std.popularity > 0.01]
+# df_scaled_std.count()
 
 #%% One hot encode "genre","mode" and"time_signature" features
 onehotenc_all = pd.get_dummies(df_scaled, columns=["genre", "mode", "time_signature"])
-onehotenc_mode_tsig = pd.get_dummies(df_scaled, columns=["mode", "time_signature"])
+onehotenc_mode_tsig = pd.get_dummies(df_scaled_std, columns=["mode", "time_signature"])
+stdscaled_onehotenc_all = pd.get_dummies(df_scaled_std, columns=["genre", "mode", "time_signature"])
+stdscaled_onehotenc_mode_tsig = pd.get_dummies(df_scaled_std, columns=["mode", "time_signature"])
 
 #%%
 # Rename/format onehot encoded columns (lowercase, no special symbols)
 replacements = {' ':'-', '&':'n', '’':'', '/':'-'}
 onehotenc_all.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), onehotenc_all.columns)
 onehotenc_mode_tsig.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), onehotenc_mode_tsig.columns)
+stdscaled_onehotenc_all.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), stdscaled_onehotenc_all.columns)
+stdscaled_onehotenc_mode_tsig.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), stdscaled_onehotenc_mode_tsig.columns)
 df_scaled.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), df_scaled.columns)
 df_scaled_std.columns = map(lambda s: s.lower().translate(str.maketrans(replacements)), df_scaled_std.columns)
 print(list(onehotenc_all.columns)) # Check column names
 print(list(onehotenc_mode_tsig.columns)) # Check column names
 print(list(df_scaled.columns)) # Check column names
 
-# %%
+# %% Export to csv files
 df_scaled.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_minmaxscaled.csv', index=False)
 df_scaled_std.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_stdscaled.csv', index=False)
 
-onehotenc_all.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_onehotenc.csv', index=False)
-onehotenc_mode_tsig.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_mode-tsig_onehotenc.csv', index=False)
+onehotenc_all.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_minmaxscaled_onehotenc-all.csv', index=False)
+onehotenc_mode_tsig.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_minmaxscaled_onehotenc-mode-tsig.csv', index=False)
+
+stdscaled_onehotenc_all.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_stdscaled_onehotenc-all.csv', index=False)
+stdscaled_onehotenc_mode_tsig.to_csv(os.path.dirname(__file__) + '/spotifyDBData_preprocessed_stdscaled_onehotenc-mode-tsig.csv', index=False)
+
 
 # %%
-
