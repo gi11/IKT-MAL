@@ -1,16 +1,18 @@
 ---
-title:  'This is the title: it contains a colon'
+title:  'Spotify Track Features'
 author:
 - Author One
 - Author Two
-keywords: [nothing, nothingness]
+# keywords: []
 numbersections: true
 toc: true
 toc_depth: 2
 abstract: |
-    This is the abstract.
+    ITMAL - Machine Learning
     
-    It consists of two paragraphs
+    Slut-Journal
+geometry:
+- margin=2.5cm
 ---
 
 \newpage
@@ -19,3 +21,5 @@ abstract: |
 \newpage
 !include data_preproc/dat_intro.md
 
+\newpage
+!include genre_classification/genre_classification.md
