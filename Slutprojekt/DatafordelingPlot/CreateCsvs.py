@@ -78,7 +78,7 @@ df_scaled_std.count()
 
 #%% One hot encode "genre","mode" and"time_signature" features
 onehotenc_all = pd.get_dummies(df_scaled, columns=["genre", "mode", "time_signature"])
-onehotenc_mode_tsig = pd.get_dummies(df_scaled_std, columns=["mode", "time_signature"])
+onehotenc_mode_tsig = pd.get_dummies(df_scaled, columns=["mode", "time_signature"])
 stdscaled_onehotenc_all = pd.get_dummies(df_scaled_std, columns=["genre", "mode", "time_signature"])
 stdscaled_onehotenc_mode_tsig = pd.get_dummies(df_scaled_std, columns=["mode", "time_signature"])
 
