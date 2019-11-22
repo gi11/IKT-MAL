@@ -46,6 +46,38 @@ ax.legend()
 
 
 #%%
+audiofeature_cols = ['popularity', 'acousticness', 'danceability', 'energy', 
+                 'instrumentalness', 'liveness', 'loudness', 'speechiness', 
+                 'tempo', 'valence']     
+
+def plotFeatureDistribution(afeatures):
+
+    cols = 2   # How many subplots pr row
+    width = 15 # Width of figure
+    prop = 0.6 # Subplot proportions, height/width ratio of subfigures
+
+    rows = int(len(afeatures)/cols)+1
+    height = (rows/cols)*width*prop
+
+    fig, ax = plt.subplots(rows, cols, figsize=(width,height))
+    plt.subplots_adjust(wspace=0.2, hspace=0.4)
+    for index, afeature in enumerate(afeatures):
+        row, col = int(index/cols), index % cols
+
+        feature_data = spotifyDBData[afeature]
+
+        ax[row,col].hist(feature_data, bins=50, density=True, label=afeature.capitalize())
+        ax[row,col].axvline(np.mean(feature_data), color='purple', label = "mean")
+        ax[row,col].axvline(np.median(feature_data), color='r', label = "median")
+        ax[row,col].axvline(np.percentile(feature_data, 5), color='orange', label = "5 percentile")
+        ax[row,col].axvline(np.percentile(feature_data, 95), color='orange', label="95 percentile")
+        ax[row,col].set_title(afeature.capitalize())
+        ax[row,col].get_yaxis().set_visible(False)
+        ax[row,col].legend()
+
+plotFeatureDistribution(audiofeature_cols)
+
+#%%
 # All feature names to be used as titles for each subplot
 Genres = spotifyDBData['genre'] # Series containing genres of each track
 UniqueGenres = Genres.unique()  # Contains the name of each genre included in DB
@@ -68,6 +100,7 @@ for index, genre in enumerate(UniqueGenres):
     title = genre + ", N = " + str(len(popularity))
     ax[row,col].hist(popularity, bins=40, density=True, label='Track Popularity')
     ax[row,col].set_title(title)
+    
 
 #%%
 # Apply One Hot Encoding to the genre feature
