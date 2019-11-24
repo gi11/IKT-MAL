@@ -1,10 +1,9 @@
 
 # Genre Classification
 
-One of the main goals of setting up the ML-pipeline with this dataset, is to investigate the prospect of predicting a genre, based on the audiofeatures of a track. This is a supervised classification task, as the desired output is one destinct category of a predefined set of possible options.
+One of the main goals of setting up the ML-pipeline with this dataset, is to investigate the prospect of predicting a genre, based on the audiofeatures of a track. Again, it must be underlined that this a supervised classification task, as the desired output is one destinct category of a predefined set of possible options.
 
 ### Algorithm Selection
-
 Before training can begin, an algorithm, or set of algorithms, must be selected for the job.
 The choice of algorithm has been affected by which algorithms the group has had previous experience with, and the primary basis of comparison has been their success at performing similar classification tasks.
 Due to the very good results with the K-Nearest Neighbors (KNN) algorithm in the MNIST search quest exercise for O3, this was the initial choice for the genre-classification task.
