@@ -1,4 +1,3 @@
-
 # Genre Classification
 
 One of the main goals of setting up the ML-pipeline with this dataset, is to investigate the prospect of predicting a genre, based on the audiofeatures of a track. Again, it must be underlined that this a supervised classification task, as the desired output is one destinct category of a predefined set of possible options.
@@ -108,4 +107,19 @@ The models performance is examined further by plotting how the models prediction
 
 ![Distribution of correct and incorrect predictions pr genre](img/kneighbors_predictions_bar.png){#kneighbors_results_bar width=100%}
 
-### Discussion
+## Trying a Neural Network
+
+In order to have something to compare the KNeighbor classifier to, another model must be made. From previous iterations, no other classifier from the scikit learn "cheat-sheet"[^1] came close to the KNeighbor classifier in terms of precision. Thus, the group wanted to test with a Neural network aswell as these are often seen as the "go-to" for classification problems.
+
+Now, like previously, the pipeline should be adopted to the NN, automating the process of the finding the optimal model hyperparameters. This task was found to be harder than expected, as the core idea was to implement scikit learns search algorithms(focusing on a gridsearch) with keras NN api, which caused some issues. In the end, the group was unsucessful in implementing such a feature for the NN, as both issues on the GPU cluster(gridsearch memory issues? Scikit learn not supporting GPU usage, while the underlying keras model attempts to use it?) and memory bounds on the groups laptop caused the idea to be unfeasible. Given that the group does not have an infinite amount of time to pour into the project, it was decided to perform a "manual" gridsearch, checking each hyperparameter by itself. This obviously goes against the core idea of pipeline automating the process, but, in order to have something to hold the KNeighbor regressor up against, a NN was required. 
+
+Given the implications from above, the work on the NN quickly become tiresome, and as such, the pipeline must be said to be non-ideal. 
+
+### Hyperparameter search
+
+From the search 
+
+
+
+
+[^1]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
