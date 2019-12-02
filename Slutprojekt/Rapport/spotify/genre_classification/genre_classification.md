@@ -8,7 +8,7 @@ The choice of algorithm has been affected by which algorithms the group has had 
 Due to the very good results with the K-Nearest Neighbors (KNN) algorithm in the MNIST search quest exercise for O3, this was the initial choice for the genre-classification task.
 
 In addition, the group has chosen a second type of model, Fully Connected Neural Networks, for comparison. This algorithm seems like a good complementary alternative to the K-nearest Neighbors algorithm, primarily due to its flexibility and scalability. 
-Since there are more ways to configure a Neural Network, it could also prove more difficult and time-comsuming to find the optimal initial configuration of the network. But this also means that it has a good chance of being able to cover any areas where the K-Nearest Neighbors is insifficient, making it a good fall-back candidate
+Since there are more ways to configure a Neural Network, it could also prove more difficult and time-comsuming to find the optimal initial configuration of the network. But this also means that it has a good chance of being able to cover any areas where the K-Nearest Neighbors is insufficient, making it a good fall-back candidate
 
 ### Data processing and structure
 
@@ -107,19 +107,103 @@ The models performance is examined further by plotting how the models prediction
 
 ![Distribution of correct and incorrect predictions pr genre](img/kneighbors_predictions_bar.png){#kneighbors_results_bar width=100%}
 
-## Trying a Neural Network
+## Neural Network
 
-In order to have something to compare the KNeighbor classifier to, another model must be made. From previous iterations, no other classifier from the scikit learn "cheat-sheet"[^1] came close to the KNeighbor classifier in terms of precision. Thus, the group wanted to test with a Neural network aswell as these are often seen as the "go-to" for classification problems.
+In order to have something to compare the KNeighbor classifier to, another model must be made. From previous iterations, no other classifier from the scikit learn "cheat-sheet"[^1] came close to the KNeighbor classifier in terms of precision. 
 
-Now, like previously, the pipeline should be adopted to the NN, automating the process of the finding the optimal model hyperparameters. This task was found to be harder than expected, as the core idea was to implement scikit learns search algorithms(focusing on a gridsearch) with keras NN api, which caused some issues. In the end, the group was unsucessful in implementing such a feature for the NN, as both issues on the GPU cluster(gridsearch memory issues? Scikit learn not supporting GPU usage, while the underlying keras model attempts to use it?) and memory bounds on the groups laptop caused the idea to be unfeasible. Given that the group does not have an infinite amount of time to pour into the project, it was decided to perform a "manual" gridsearch, checking each hyperparameter by itself. This obviously goes against the core idea of pipeline automating the process, but, in order to have something to hold the KNeighbor regressor up against, a NN was required. 
+Now, like previously, the pipeline should be adopted to the NN, automating the process of the finding the optimal model hyperparameters. This task was found to be harder than expected, as the core idea was to implement scikit learns search algorithms(focusing on a gridsearch) with keras NN api, which caused some issues. In the end, the group was unsucessful in implementing such a feature for the NN, as both issues on the GPU cluster(gridsearch memory issues? Scikit learn not supporting GPU usage, while the underlying keras model attempts to use it?) and memory bounds on the groups laptop caused the idea to be unfeasible. Given that the group does not have an infinite amount of time to pour into the project, it was decided to perform a "manual" gridsearch, checking each hyperparameter by itself. This obviously goes against the core idea of the pipeline automating the process, but, in order to have something to hold the KNeighbor regressor up against, a NN was required. 
 
 Given the implications from above, the work on the NN quickly become tiresome, and as such, the pipeline must be said to be non-ideal. 
 
+
+[^1]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
+
 ### Hyperparameter search
 
-From the search 
+Before the search began, it was decided to use a NN with only one hidden layer. Afterwards, like stated, a manual search has been performed attempting to identify the optimal; _batch\_size_, _number of neurons_, _hidden layer activation function_, _kernel initializer_ and _optimizer_:
 
+```python
+batch_size = [10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000]
+neurons = [1, 2, 3, 4, 5 , 6 , 7, 8, 9, 10, 11, 12, 13, 14, 15,
+          16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 50, 100, 150]
+activation = ['softmax', 'softplus', 'softsign', 
+            'relu', 'tanh', 'sigmoid', 'hard_sigmoid', 'linear']
+init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero',
+             'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
+optimizer = [SGD(lr=0.1), RMSprop(lr=0.1), Adagrad(lr=0.1), 
+            Adadelta(lr=0.1), Adam(lr=0.1), Adamax(lr=0.1), Nadam(lr=0.1)]
+```
+From this, a model(NN) with the following hyperparameters was found to perform the best: 
 
+```python
+def createModel():
+    model = Sequential()
+    model.add(Dense(input_dim=15, units=50, activation="sigmoid",
+    kernel_initializer="he_uniform"))
+    model.add(Dense(units=25, activation="sigmoid"))
+
+    model.compile(loss='categorical_crossentropy', 
+                  optimizer=Adam(lr=0.1), 
+                  metrics=['acc', f1_m, precision_m, recall_m])
+    return model
+```
+### Results
+
+Initializing a model with the found hyperparameters and fitting it to the training data, has yielded the results shown below:
+
+#### Performance metrics
+
+The results of the NN has been processed to match the shape used for Scikit learn's scoring metrics. The NN output differs from the KNeighbor classifier in that the output is still binarized, and each label contains the weight assigned by the model(How sure the model is of it's guess). As such, the output has been processed to use one hot encoded outputs, only flagging the label which the model had assigned the heighest weight. The results is thus directly comparable to that of the KNeighbor classifier: 
+
+|    | Precision    | Recall  | F1-score   | Support |
+|-----|-----|-----|-----|-----|
+|        Accuracy |           |          |     0.40  |   NaN |
+|      Macro avg. |      0.41 |     0.40 |     0.39  |   NaN |
+|   Weighted avg. |      0.40 |     0.40 |     0.39  |   NaN |
+Table: Classification results (summary) \label{table_summary}
+
+#### Distribution of predictions pr. class
+
+The models performance is examined further by plotting how the models predictions for the test data is distributed for each genre (true and false positives).
+
+![Distribution of correct and incorrect predictions pr genre](img/NN_Predictions_bar.png){#NN_results_bar width=100%}
+
+## The popularity estimator
+
+For the popularity estimation, a simple randomizedsearch was performed using the "scikit learn cheatsheet"[^1]. Here, the "Stochastic gradient descent" algorithm was found to be the best estimator. The search evaluation was based on the "_R2_" score, of which is an indicator of the "goodness of fit" for the regressor. 
+
+Name                Value  
+-------             ------ 
+`loss`              `squared_loss, huber, epsilon_insensitive, squared_epsilon_insensitive`
+`penalty`             `none, l2, l1, elasticnet`
+`alpha `              `0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015`
+`fit_intercept`       `True, False`
+
+It should be stated that since our regressor boiled down to "_how close can we get to the true popularity_" value, the results are very limited in regards to presentation, as the easiest way to measure the performance, is by the mean deviation(either squared or absolute). 
+
+### Results
+
+The results of the SGD regressor is measured by it's MSE and MAE on the test set, of which the following scores was found using scikit learns build in MSE and MAE functions: 
+
+Method              Score  
+-------             ------ 
+`MAE:`              `~0.075`
+`MSE:`              `~0.010`   
+
+Since the popularity feature has already been scaled to a value between 0 - 1, the score of the MAE translated directly to er percentage score; 7,5% deviation from the true popularity.
 
 
 [^1]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
+
+
+
+
+
+
+
+
+
+
+
+
+
