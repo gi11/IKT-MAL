@@ -9,7 +9,7 @@ toc: true
 toc_depth: 2
 abstract: |
     ITMAL - Machine Learning
-    
+
     Slut-Journal
 geometry:
 - margin=2.5cm
@@ -24,5 +24,5 @@ geometry:
 \newpage
 !include genre_classification/genre_classification.md
 
-!include genre_classification/discussion.md
+<!-- !include genre_classification/discussion.md -->
 

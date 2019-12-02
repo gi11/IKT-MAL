@@ -1,8 +1,8 @@
-## Discussion and Conclusion
+# Discussion and Conclusion
 
 In this section, the results is discussed and reflected upon. The classification model/pipeline and regression model/pipeline will be discussed seperately. 
 
-#### A note on underfitting and overfitting
+## A note on underfitting and overfitting
 
 Before discussing the results of the models chosen in this project, one should stop and ask whether the models are even good? Do they have the means to perform the task? These questions relate to whether the models are underfitted or overfitted - and how can one be sure they are neither? 
 
@@ -14,18 +14,18 @@ Feature reduction(or the posibility of it) could be done in order to minimize bi
 
 [^2]:https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff#k-nearest_neighbors
 
-### Classification
+## Classification
 
 For the classification models, the group is very satisfied with the results, even though a f1 score of 37% and 40% does not seem like much. If compared to the randomcase, or the case of dummy identifier, we would have expected a yield of $\frac{1}{25}$. Furthermore, the plots of the correct guesses pr. genre, supports the theory that was discussed during the PCA analysis - that the some genres, comedy especially, was easier to predict correctly than those more closely grouped together. This theory however gives reason to another hypothesis - genres is inheretently subjective(earlier in the report the group stated that _"Die Zauberflöte"_ was opera, but this is just the groups opinion), and as such, their labels does not give reason to a clearly divided group each. Assuming the beforementionend question true, no classifier should be able to predict genres with certainty, as the truth would be that the same songs could be classified as more than one genre.
 
 Looking at the dataset with the intention of genre classification, it must be noted that a lot of features was found to be uncorrelated to the desired prediction. This was mainly from the fact that the dataset in reality contained a lot of labelled features - some of which was Unique(and therefore had to be removed), and some which had almost 0 correlation with the genres(e.g _"Mode"_). 
 
-### Regression
+## Regression
 
 Since the idea with the dataset originally was to only produce a regressor able to predict the popularity of songs, the project has definitely given the group some experience in regards to the reality of the ML world. Even though no correlation could immeadiately be made by the group in the preprocessing between popularity and other features, the results after the search was no less than suprising. A mean error of around 7,5% was much less than expected. The theory here is that by removing the samples with a popularity of 0 greatly increased the correlation in some way not obvious to the group. 
 
 
-### General for the project
+## General for the project
 
 Looking at the roadmap of getting to the models, the group must conclude that the pipeline is not as automated as first hoped. Likewise, the data processing took a lot longer than originally anticipated, but in turn, yielded a great deal more knowledge of the dataset. Seeing as this is the first time the group is attempting to implement an _"End-to-end ML"_ project, it must be concluded that a lot of first time errors was made - e.g trying to include that dataprocessing part of the pipeline with the visualization just made the code bloated and unreadable. Although not entirely succesfull in the implementation of an automated pipeline, the group is satisfied with the results. 
 

@@ -166,17 +166,17 @@ Table: Classification results (summary) \label{table_summary}
 
 The models performance is examined further by plotting how the models predictions for the test data is distributed for each genre (true and false positives).
 
-![Distribution of correct and incorrect predictions pr genre](img/NN_Predictions_bar.png){#NN_results_bar width=100%}
+![Distribution of correct and incorrect predictions pr genre](img/NN_Predictions.png){#NN_results_bar width=100%}
 
-## The popularity estimator
+# The popularity estimator
 
 For the popularity estimation, a simple randomizedsearch was performed using the "scikit learn cheatsheet"[^1]. Here, the "Stochastic gradient descent" algorithm was found to be the best estimator. The search evaluation was based on the "_R2_" score, of which is an indicator of the "goodness of fit" for the regressor. 
 
-### Algorithm Selection
+## Algorithm Selection
 
 Though it was not obvious to us during the data visualizion it seems that a Linear Regression performs best in terms of predicting poularity values. In this case the Stochastic Gradient Descent Regressor is a recommended choice for a model as our data set contains above 10.000 samples.[^2]
 
-### Data processing and structure and hyperparameter search
+## Data processing and structure and hyperparameter search
 
 The input for the regression model is very similar to that of the classification problem, so for more detail on the preprocessing, please see that section, \ref{classification_preprocess} The key difference being that genre values is not isolated as the y-values instead in make up part of the feature set. Instead the popularity values are selected  as the y-values for this set. These values are represented as a float value between 0 and 1. - Similar to the pipeline for the classification model the data set is split into two partitions for training and validation.
 
@@ -191,7 +191,7 @@ Name                Value
 
 It should be stated that since our regressor boiled down to "_how close can we get to the true popularity_" value, the results are very limited in regards to presentation, as the easiest way to measure the performance, is by the mean deviation(either squared or absolute). 
 
-### Results
+## Results
 
 The results of the SGD regressor is measured by it's MSE and MAE on the test set, of which the following scores was found using scikit learns build in MSE and MAE functions: 
 
@@ -208,7 +208,7 @@ Since the popularity feature has already been scaled to a value between 0 - 1, t
 [^1]: https://scikit-learn.org/stable/modules/sgd.html#regression
 
 
-!include genre_classification/discussion.md
+!include discussion.md
 
 
 
