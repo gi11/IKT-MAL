@@ -10,7 +10,7 @@ Due to the very good results with the K-Nearest Neighbors (KNN) algorithm in the
 In addition, the group has chosen a second type of model, Fully Connected Neural Networks, for comparison. This algorithm seems like a good complementary alternative to the K-nearest Neighbors algorithm, primarily due to its flexibility and scalability. 
 Since there are more ways to configure a Neural Network, it could also prove more difficult and time-comsuming to find the optimal initial configuration of the network. But this also means that it has a good chance of being able to cover any areas where the K-Nearest Neighbors is insufficient, making it a good fall-back candidate
 
-### Data processing and structure
+### Data processing and structure {#classification_preprocess}
 
 The input for the classification model consists of all the scaled audiofeatures, along with one-hot encoded "mode" and "time_signature" features. This gives the model a total of 15 features to use a basis for assigning a genre to each input.
 
@@ -172,6 +172,16 @@ The models performance is examined further by plotting how the models prediction
 
 For the popularity estimation, a simple randomizedsearch was performed using the "scikit learn cheatsheet"[^1]. Here, the "Stochastic gradient descent" algorithm was found to be the best estimator. The search evaluation was based on the "_R2_" score, of which is an indicator of the "goodness of fit" for the regressor. 
 
+### Algorithm Selection
+
+Though it was not obvious to us during the data visualizion it seems that a Linear Regression performs best in terms of predicting poularity values. In this case the Stochastic Gradient Descent Regressor is a recommended choice for a model as our data set contains above 10.000 samples.[^2]
+
+### Data processing and structure and hyperparameter search
+
+The input for the regression model is very similar to that of the classification problem, so for more detail on the preprocessing, please see that section, \ref{classification_preprocess} The key difference being that genre values is not isolated as the y-values instead in make up part of the feature set. Instead the popularity values are selected  as the y-values for this set. These values are represented as a float value between 0 and 1. - Similar to the pipeline for the classification model the data set is split into two partitions for training and validation.
+
+In the gridsearch to identify the best combination, different models was selected  and tested with individual sets of hyperparameters. The tested models include: Ridge, Lasso, SGDRegressor (Stochastic Gradient Descent Regressor), SVR (Support Vector Machine for Regression). In the end it was the SGDRegressor which performed best, see the table below for the options included in the hyperparameter gridsearch for this model.
+
 Name                Value  
 -------             ------ 
 `loss`              `squared_loss, huber, epsilon_insensitive, squared_epsilon_insensitive`
@@ -194,6 +204,8 @@ Since the popularity feature has already been scaled to a value between 0 - 1, t
 
 
 [^1]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
+
+[^1]: https://scikit-learn.org/stable/modules/sgd.html#regression
 
 
 
