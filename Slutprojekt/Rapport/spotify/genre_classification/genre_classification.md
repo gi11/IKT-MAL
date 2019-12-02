@@ -208,8 +208,7 @@ Since the popularity feature has already been scaled to a value between 0 - 1, t
 [^1]: https://scikit-learn.org/stable/modules/sgd.html#regression
 
 
-
-
+!include genre_classification/discussion.md
 
 
 

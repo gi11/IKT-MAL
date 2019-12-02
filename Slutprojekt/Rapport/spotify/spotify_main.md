@@ -23,3 +23,6 @@ geometry:
 
 \newpage
 !include genre_classification/genre_classification.md
+
+!include genre_classification/discussion.md
+
