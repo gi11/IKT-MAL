@@ -230,7 +230,7 @@ plot_audiofeatures(all_genres, width=10)
 # was used
 
 def plot_nonOptimalFeaturePlot(fname, genres, width=10, hspace=0.3):
-    plt.figure(figsize=(width, width))
+    plt.figure(figsize=(width, width/4))
     means = []
     xtickPos = []
     for i, genre in enumerate(genres):
@@ -240,12 +240,13 @@ def plot_nonOptimalFeaturePlot(fname, genres, width=10, hspace=0.3):
         xtickPos.append(i)    
     
     plt.bar(xtickPos, means)
-    plt.xticks(xtickPos, [genre.capitalize() for genre in genres])
+    plt.xticks(xtickPos, [genre.capitalize() for genre in genres], rotation='vertical')
+    plt.ylabel("Mean Popularity")
     
 features = ["popularity",]
-
-plot_nonOptimalFeaturePlot("popularity", ["blues", "classical", "comedy", "country", "electronic", 
-                    "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"])
+selected_12_genres =  ["blues", "classical", "comedy", "country", "electronic", 
+                    "folk", "jazz", "opera", "rap", "rock", "reggae", "soul"]
+plot_nonOptimalFeaturePlot("popularity", all_genres)
     
     
 #%%

@@ -1,16 +1,14 @@
 ---
-title:  'Spotify Track Features'
+title: 'Spotify Track Features'
+subtitle:  'ITMAL Slutprojekt - Gruppe 28'
 author:
-- Author One
-- Author Two
-# keywords: []
+- Jacob Odgaard Hausted - 201510912
+- Gill Lumer-Klabbers - 201607384
+- Kasper Gnutzmann Andersen - 201607263
+date: 5/12-2019
 numbersections: true
 toc: true
 toc_depth: 2
-abstract: |
-    ITMAL - Machine Learning
-
-    Slut-Journal
 geometry:
 - margin=2.5cm
 ---
@@ -18,10 +16,10 @@ geometry:
 \newpage
 !include introduction/introduction.md
 
-\newpage
+<!-- \newpage -->
 !include data_preproc/dat_intro.md
 
-\newpage
+<!-- \newpage -->
 !include genre_classification/genre_classification.md
 
 <!-- !include genre_classification/discussion.md -->

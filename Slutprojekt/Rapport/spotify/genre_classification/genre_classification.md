@@ -1,23 +1,23 @@
 # Genre Classification
 
-One of the main goals of setting up the ML-pipeline with this dataset, is to investigate the prospect of predicting a genre, based on the audiofeatures of a track. Again, it must be underlined that this a supervised classification task, as the desired output is one destinct category of a predefined set of possible options.
+One of the main goals of setting up the ML-pipeline with this dataset, is to investigate the prospect of predicting a genre, based on the audiofeatures of a track. As mentioned, this is a supervised classification task, as the desired output is one destinct category of a predefined set of possible options.
 
 ### Algorithm Selection
 Before training can begin, an algorithm, or set of algorithms, must be selected for the job.
 The choice of algorithm has been affected by which algorithms the group has had previous experience with, and the primary basis of comparison has been their success at performing similar classification tasks.
 Due to the very good results with the K-Nearest Neighbors (KNN) algorithm in the MNIST search quest exercise for O3, this was the initial choice for the genre-classification task.
 
-In addition, the group has chosen a second type of model, Fully Connected Neural Networks, for comparison. This algorithm seems like a good complementary alternative to the K-nearest Neighbors algorithm, primarily due to its flexibility and scalability. 
-Since there are more ways to configure a Neural Network, it could also prove more difficult and time-comsuming to find the optimal initial configuration of the network. But this also means that it has a good chance of being able to cover any areas where the K-Nearest Neighbors is insufficient, making it a good fall-back candidate
+In addition, the group has chosen a second type of model, fully connected Neural Networks (NN), for comparison. This algorithm seems like a good complementary alternative to the KNN algorithm, primarily due to its flexibility and scalability. 
+Since there are more ways to configure a Neural Network, it could also prove more difficult and time-comsuming to find the optimal initial configuration of the network. But this also means that it has a good chance of being able to cover any areas where the KNN is insufficient, making it a good fall-back candidate
 
 ### Data processing and structure {#classification_preprocess}
 
-The input for the classification model consists of all the scaled audiofeatures, along with one-hot encoded "mode" and "time_signature" features. This gives the model a total of 15 features to use a basis for assigning a genre to each input.
+The input for the classification models consists of all the scaled audiofeatures, along with the one-hot encoded 'mode' and 'time signature' features discussed in Section 2.2. This gives the model a total of 15 features to use a basis for assigning a genre to each input. The classes themselves are created from the "genre" column of the dataset, which is encoded through a LabelEncoder, assigning an integer to each possible value, replacing the original string. This means that the classes will be represented by integer values ranging from 0-24, and this data will be the y-values for our model.
 
-The classes themselves are created from the "genre" column of the dataset, which is encoded through a LabelEncoder, assigning an integer to each possible value, replacing the original string. This means that the classes will be represented by integer values ranging from 0-24, and this data will be the y-values for our model.
-
-Before the model is trained, the data is split into training and validation sets. The model is fitted to the training-set, and afterwards the validation-set is used to test how the model responds to previously unknown samples. This is an important part of the process, as it can be used to identify whether or not the models ability to generalize has been been compromised by over-fitting to the training data.
+Before the model is trained, the data is split into training and validation sets. The model is fitted to the training-set, and afterwards the validation-set is used to test how the model responds to previously unknown samples. 
+<!--  -->
 The proportion of the dataset assigned to the testset was selected to be $\approx 0.3$.
+<!-- \newpage -->
 
 ## K-Nearest Neighbors
 
@@ -26,34 +26,49 @@ As mentioned, the KNN classifier has been selected as the primary candidate for 
 ### Hyperparameter Search
 
 In order to get the best possible performance, the model is initialized multiple times with different combinations of hyperparameters, so that the best values for each hyperparameter can be found by evaluating the performance of each combination.
-The first search performed on the KNN model considers the hyperparameters shown in Table \ref{table_hyperparameters} :
+The search performed on the KNN classifier considers the following hyperparameters and values:
+<!-- shown in Table \ref{table_hyperparameters} : -->
 
-
-Name                Value  
+<!-- Name                Value  
 -------             ------ 
 `n_neighbors`       `[3, 4, 5]`
 `weights`           `['uniform', 'distance']`
 `algorithm`         `['ball_tree', 'kd_tree', 'brute']`
-`p`                 `[2, 3, 4]`
+`p`                 `[2, 3, 4, 5, 10, 20, 50, 100]` -->
 
-Table: KNN hyperparameter-space to search \label{table_hyperparameters}
+```python
+n_neighbors = [3, 4, 5, 10, 20, 50, 100]
+    weights = ['uniform', 'distance']
+  algorithm = ['ball_tree', 'kd_tree', 'brute']
+          p = [2, 3, 4]
+```
 
-As the `n_neighbors` was set relatively low in this first search, larger values for this parameter were used in a later search, where the values 10, 20, 50 and 100 were tested for `n_neighbors`. After searching through the selected parameter space, the best hyperparameters were found to be: 
+<!-- Table: KNN hyperparameter-space to search \label{table_hyperparameters} -->
 
-- `n_neighbors=100`
+<!-- As the `n_neighbors` was set relatively low in this first search, larger values for this parameter were used in a later search, where the values 10, 20, 50 and 100 were tested for `n_neighbors`.  -->
+After searching through the selected hyperparameter space, the best hyperparameters were found to be: 
+
+```python
+n_neighbors = 100
+    weights = 'uniform'
+  algorithm = 'ball_tree'
+          p = 2
+```
+
+<!-- - `n_neighbors=100`
 - `weights='uniform'`
-- `algorithm='ball_tree'`  
-- and `p=2`
+- `algorithm='ball_tree'` 
+- and `p=2` -->
 
 These are the final parameters given to the K-Nearest Neigbor model.
 
 ### Results
 
-Initializing a model with the found hyperparameters and fitting it to the training data, has yielded the results shown below:
+Initializing a model with the found hyperparameters and fitting it to the training data, has yielded the results shown in Table \ref{table_knn_genres} and Table \ref{table_knn_summary}
 
 #### Performance metrics
 
-These performance metrics for the KNN model are taken from sklearn's classification report, which contains the following four metrics:
+The performance metrics for the KNN model are taken from sklearn's classification report, which contains the following four metrics:
 
 - *Precision* - The fraction of positives that were true positive, defined as $\frac{tp}{tp+fp}$
 - *Recall* - The fraction of positive samples the model was able to find, defined as $\frac{tp}{tp + fn}$
@@ -61,15 +76,7 @@ These performance metrics for the KNN model are taken from sklearn's classificat
 - *Support* - The number of samples in the validation set
 
 In combination, these four metrics give a good picture of the models overall performance.
-
-|    | Precision    | Recall  | F1-score   | Support |
-|-----|-----|-----|-----|-----|
-|        Accuracy |           |          |     0.38  |   66778 |
-|      Macro avg. |      0.38 |     0.38 |     0.37  |   66778 |
-|   Weighted avg. |      0.37 |     0.38 |     0.37  |   66778 |
-
-
-Table: Classification results (summary) \label{table_summary}
+<!-- |             Ska |      0.52 |     0.45 |     0.48  |    2762 | -->
 
 | Class/Genre       | Precision    | Recall  | F1-score   | Support |
 |-----|-----|-----|-----|-----|
@@ -94,46 +101,55 @@ Table: Classification results (summary) \label{table_summary}
 |          Reggae |      0.40 |     0.38 |     0.39  |    2588 |
 |       Reggaeton |      0.45 |     0.58 |     0.51  |    2636 |
 |            Rock |      0.25 |     0.32 |     0.28  |    2744 |
-|             Ska |      0.52 |     0.45 |     0.48  |    2762 |
 |            Soul |      0.21 |     0.11 |     0.14  |    2739 |
 |      Soundtrack |      0.53 |     0.69 |     0.60  |    2821 |
 |           World |      0.37 |     0.36 |     0.36  |    2694 |
 
-Table: Classification results (pr. class/genre) \label{table_genres}
+Table: Classification results (pr. class/genre) \label{table_knn_genres}
+
+|    | Precision    | Recall  | F1-score   | Support |
+|-----|-----|-----|-----|-----|
+|        Accuracy |           |          |     0.38  |   66778 |
+|      Macro avg. |      0.38 |     0.38 |     0.37  |   66778 |
+|   Weighted avg. |      0.37 |     0.38 |     0.37  |   66778 |
+
+
+Table: Classification results (summary) \label{table_knn_summary}
 
 #### Distribution of predictions pr. class
 
 The models performance is examined further by plotting how the models predictions for the test data is distributed for each genre (true and false positives).
 
-![Distribution of correct and incorrect predictions pr genre](img/kneighbors_predictions_bar.png){#kneighbors_results_bar width=100%}
+![Distribution of correct and incorrect positive predictions pr genre](img/kneighbors_predictions_bar.png){#kneighbors_results_bar width=100%}
 
 ## Neural Network
 
-In order to have something to compare the KNeighbor classifier to, another model must be made. From previous iterations, no other classifier from the scikit learn "cheat-sheet"[^1] came close to the KNeighbor classifier in terms of precision. 
+The second model chosen for genre-prediction is the fully connected neural network, in order to have something to compare the KNeighbor classifier to. From previous iterations, no other classifier from the scikit learn "cheat-sheet"[^4] came close to the KNeighbor classifier in terms of precision. 
 
-Now, like previously, the pipeline should be adopted to the NN, automating the process of the finding the optimal model hyperparameters. This task was found to be harder than expected, as the core idea was to implement scikit learns search algorithms(focusing on a gridsearch) with keras NN api, which caused some issues. In the end, the group was unsucessful in implementing such a feature for the NN, as both issues on the GPU cluster(gridsearch memory issues? Scikit learn not supporting GPU usage, while the underlying keras model attempts to use it?) and memory bounds on the groups laptop caused the idea to be unfeasible. Given that the group does not have an infinite amount of time to pour into the project, it was decided to perform a "manual" gridsearch, checking each hyperparameter by itself. This obviously goes against the core idea of the pipeline automating the process, but, in order to have something to hold the KNeighbor regressor up against, a NN was required. 
+Now, like previously, the pipeline should be adopted to the NN, automating the process of the finding the optimal model hyperparameters. This task was found to be harder than expected, as the core idea was to implement scikit learns search algorithms (focusing on a gridsearch) with the keras NN api, which caused some issues. 
+In the end, the group was unsucessful in implementing such a feature for the NN, as both issues on the GPU cluster (gridsearch memory issues? Scikit learn not supporting GPU usage, while the underlying keras model attempts to use it?)  and memory bounds on the groups laptop caused the idea to be unfeasible. Given that the group does not have an infinite amount of time to pour into the project, it was decided to perform a "manual" gridsearch, checking each hyperparameter by itself. This obviously goes against the core idea of the pipeline automating the process, but, in order to have something to hold the KNeighbor regressor up against, a NN was required. 
 
-Given the implications from above, the work on the NN quickly become tiresome, and as such, the pipeline must be said to be non-ideal. 
+Given the implications from above, the work on the NN quickly becomes tiresome, and as such, the pipeline must be said to be non-ideal. 
 
-
-[^1]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
+[^4]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
 
 ### Hyperparameter search
 
-Before the search began, it was decided to use a NN with only one hidden layer. Afterwards, like stated, a manual search has been performed attempting to identify the optimal; _batch\_size_, _number of neurons_, _hidden layer activation function_, _kernel initializer_ and _optimizer_:
+Before the search began, it was decided to use a NN with only one hidden layer. Afterwards, like stated, a manual search has been performed attempting to identify the optimal; `batch_size`, number of `neurons`, hidden layer `activation` function, kernel initializer (`init_mode`) and `optimizer`:
 
 ```python
 batch_size = [10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000]
-neurons = [1, 2, 3, 4, 5 , 6 , 7, 8, 9, 10, 11, 12, 13, 14, 15,
-          16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 50, 100, 150]
+   neurons = [1, 2, 3, 4, 5 , 6 , 7, 8, 9, 10, 11, 12, 13, 14, 15,
+              16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 50, 100, 150]
 activation = ['softmax', 'softplus', 'softsign', 
-            'relu', 'tanh', 'sigmoid', 'hard_sigmoid', 'linear']
-init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero',
-             'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
-optimizer = [SGD(lr=0.1), RMSprop(lr=0.1), Adagrad(lr=0.1), 
-            Adadelta(lr=0.1), Adam(lr=0.1), Adamax(lr=0.1), Nadam(lr=0.1)]
+              'relu', 'tanh', 'sigmoid', 'hard_sigmoid', 'linear']
+ init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero',
+              'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
+ optimizer = [SGD(lr=0.1), RMSprop(lr=0.1), Adagrad(lr=0.1), 
+              Adadelta(lr=0.1), Adam(lr=0.1), Adamax(lr=0.1), Nadam(lr=0.1)]
 ```
-From this, a model(NN) with the following hyperparameters was found to perform the best: 
+
+From this, a NN model with the following hyperparameters was found to perform the best: 
 
 ```python
 def createModel():
@@ -141,7 +157,6 @@ def createModel():
     model.add(Dense(input_dim=15, units=50, activation="sigmoid",
     kernel_initializer="he_uniform"))
     model.add(Dense(units=25, activation="sigmoid"))
-
     model.compile(loss='categorical_crossentropy', 
                   optimizer=Adam(lr=0.1), 
                   metrics=['acc', f1_m, precision_m, recall_m])
@@ -149,47 +164,49 @@ def createModel():
 ```
 ### Results
 
-Initializing a model with the found hyperparameters and fitting it to the training data, has yielded the results shown below:
+Initializing a model with the found hyperparameters and fitting it to the training data, has yielded the results shown in Table \ref{table_NN_summary}:
 
 #### Performance metrics
 
-The results of the NN has been processed to match the shape used for Scikit learn's scoring metrics. The NN output differs from the KNeighbor classifier in that the output is still binarized, and each label contains the weight assigned by the model(How sure the model is of it's guess). As such, the output has been processed to use one hot encoded outputs, only flagging the label which the model had assigned the heighest weight. The results is thus directly comparable to that of the KNeighbor classifier: 
+The results of the NN has been processed to match the shape used for Scikit learn's scoring metrics. The NN output differs from the KNeighbor classifier in that the output is still binarized, and each label contains the weight assigned by the model (How sure the model is of it's guess), similar to the output structure of sklearns `predict_proba()`. However, as the previous KNN results were generated from the regular `predict()`, the NN output has been processed to use one hot encoded outputs, only flagging the label which the model had assigned the heighest weight. The results is thus directly comparable to that of the KNeighbor classifier:
 
 |    | Precision    | Recall  | F1-score   | Support |
 |-----|-----|-----|-----|-----|
 |        Accuracy |           |          |     0.40  |   NaN |
 |      Macro avg. |      0.41 |     0.40 |     0.39  |   NaN |
 |   Weighted avg. |      0.40 |     0.40 |     0.39  |   NaN |
-Table: Classification results (summary) \label{table_summary}
+
+Table: Classification results (summary) \label{table_NN_summary}
 
 #### Distribution of predictions pr. class
 
 The models performance is examined further by plotting how the models predictions for the test data is distributed for each genre (true and false positives).
 
-![Distribution of correct and incorrect predictions pr genre](img/NN_Predictions.png){#NN_results_bar width=100%}
+![Distribution of correct and incorrect positive predictions pr genre](img/NN_Predictions.png){#NN_results_bar width=100%}
 
 # The popularity estimator
 
-For the popularity estimation, a simple randomizedsearch was performed using the "scikit learn cheatsheet"[^1]. Here, the "Stochastic gradient descent" algorithm was found to be the best estimator. The search evaluation was based on the "_R2_" score, of which is an indicator of the "goodness of fit" for the regressor. 
+For the popularity estimation, a simple randomized search was performed using the "scikit learn cheatsheet"[^5]. Here, the "Stochastic gradient descent" algorithm was found to be the best estimator. The search evaluation was based on the "_R2_" score, of which is an indicator of the "goodness of fit" for the regressor. 
 
 ## Algorithm Selection
 
-Though it was not obvious to us during the data visualizion it seems that a Linear Regression performs best in terms of predicting poularity values. In this case the Stochastic Gradient Descent Regressor is a recommended choice for a model as our data set contains above 10.000 samples.[^2]
+Though it was not obvious to us during the data visualizion it seems that a Linear Regression performs best in terms of predicting poularity values. In this case the Stochastic Gradient Descent Regressor is a recommended choice for a model as our data set contains above 10.000 samples.[^6]
 
-## Data processing and structure and hyperparameter search
+## Data processing, structure and hyperparameter search
 
-The input for the regression model is very similar to that of the classification problem, so for more detail on the preprocessing, please see that section, \ref{classification_preprocess} The key difference being that genre values is not isolated as the y-values instead in make up part of the feature set. Instead the popularity values are selected  as the y-values for this set. These values are represented as a float value between 0 and 1. - Similar to the pipeline for the classification model the data set is split into two partitions for training and validation.
+The input for the regression model is very similar to that of the classification problem, so for more detail on the preprocessing, please see Section \ref{classification_preprocess} The key difference being that genre values are not isolated as the y-values instead in make up part of the feature set. Instead the popularity values are selected as the y-values for this set. These values are represented as a float value between 0 and 1. - Similar to the pipeline for the classification model, the data set is split into two partitions for training and validation.
 
-In the gridsearch to identify the best combination, different models was selected  and tested with individual sets of hyperparameters. The tested models include: Ridge, Lasso, SGDRegressor (Stochastic Gradient Descent Regressor), SVR (Support Vector Machine for Regression). In the end it was the SGDRegressor which performed best, see the table below for the options included in the hyperparameter gridsearch for this model.
+In the gridsearch to identify the best model, different algorithms were selected and tested with individual sets of hyperparameters. The tested models include: Ridge, Lasso, SGDRegressor (Stochastic Gradient Descent Regressor), SVR (Support Vector Machine for Regression). In the end it was the SGDRegressor which performed best, with the following options included in the hyperparameter gridsearch for this model:
 
-Name                Value  
--------             ------ 
-`loss`              `squared_loss, huber, epsilon_insensitive, squared_epsilon_insensitive`
-`penalty`             `none, l2, l1, elasticnet`
-`alpha `              `0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009, 0.001, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015`
-`fit_intercept`       `True, False`
-
-It should be stated that since our regressor boiled down to "_how close can we get to the true popularity_" value, the results are very limited in regards to presentation, as the easiest way to measure the performance, is by the mean deviation(either squared or absolute). 
+```python
+         loss = ['squared_loss', 'huber', 'epsilon_insensitive', 
+                 'squared_epsilon_insensitive']
+      penalty = ['none', 'l2', 'l1', 'elasticnet']
+        alpha = [0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 
+                 0.0009, 0.001, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015]
+fit_intercept = [True, False]
+```
+It should be stated that since our regressor boiled down to "_how close can we get to the true popularity_" value, the results are very limited in regards to presentation, as the easiest way to measure the performance is by the mean deviation, either squared or absolute. 
 
 ## Results
 
@@ -203,9 +220,9 @@ Method              Score
 Since the popularity feature has already been scaled to a value between 0 - 1, the score of the MAE translated directly to er percentage score; 7,5% deviation from the true popularity.
 
 
-[^1]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
+[^5]: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
 
-[^1]: https://scikit-learn.org/stable/modules/sgd.html#regression
+[^6]: https://scikit-learn.org/stable/modules/sgd.html#regression
 
 
 !include discussion.md
