@@ -6,6 +6,8 @@ author:
 - Gill Lumer-Klabbers - 201607384
 - Kasper Gnutzmann Andersen - 201607263
 date: 5/12-2019
+include-before: |
+    'All members of the group have contributed to the project and this report'
 numbersections: true
 toc: true
 toc_depth: 2
